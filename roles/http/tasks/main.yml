@@ -12,19 +12,31 @@
       - php-mysql
       - php-zip
     update_cache: yes
+
 - name: enable rewrite mod
   apache2_module:
     state: present
     name: rewrite
+  notify: restart apache
+
 - name: install website
   copy:
     src: website.conf
     dest: /etc/apache2/sites-available/website.conf
+  notify: restart apache
+
 - name: enable website
   file:
     src: /etc/apache2/sites-available/website.conf
     dest: /etc/apache2/sites-enabled/website.conf
     state: link
+  notify: restart apache
+
+- name: Remove default conf
+  file:
+    path: /etc/apache2/sites-enabled/000-default.conf
+    state: absent
+  notify: restart apache
 
 - name: Concatenate the install and directory into a single variable
   set_fact:
@@ -50,7 +62,6 @@
   register: "wp_salt"
   become: no
   become_method: sudo
-
 
 - name: Copy WordPress config file
   template: src=wp-config.php dest={{path}}

@@ -1,5 +1,3 @@
-<!--{{ wp_salt.stdout }}-->
-
 <?php
 /**
  * La configuration de base de votre installation WordPress.

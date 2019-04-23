@@ -1,11 +1,11 @@
 - name: Mysql
-  hosts: all
+  hosts: mysqld
   remote_user: louis
   become: true
   roles:
     - mysql
 - name: Apache
-  hosts: all
+  hosts: httpd
   remote_user: louis
   become: true
   roles:
