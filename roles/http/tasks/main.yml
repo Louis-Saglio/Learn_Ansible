@@ -1,0 +1,62 @@
+- name: install Apache
+  apt:
+    name:
+      - apache2
+      - php
+      - libapache2-mod-php
+      - php-bcmath
+      - php-bz2
+      - php-intl
+      - php-gd
+      - php-mbstring
+      - php-mysql
+      - php-zip
+    update_cache: yes
+- name: enable rewrite mod
+  apache2_module:
+    state: present
+    name: rewrite
+- name: install website
+  copy:
+    src: website.conf
+    dest: /etc/apache2/sites-available/website.conf
+- name: enable website
+  file:
+    src: /etc/apache2/sites-available/website.conf
+    dest: /etc/apache2/sites-enabled/website.conf
+    state: link
+
+- name: Concatenate the install and directory into a single variable
+  set_fact:
+    path: "{{wp_install_path}}/{{wp_directory_name}}"
+
+- name: Ensure that installation directory exists
+  file: path={{path}} state=directory
+
+- name: Download Latest Version to /tmp
+  get_url: url=https://wordpress.org/latest.tar.gz force=no dest=/tmp/wordpress.tar.gz
+
+- name: Extract archive
+  unarchive: src=/tmp/wordpress.tar.gz dest=/tmp copy=no
+
+- name: Move extracted directory to {{path}}
+  shell: cp -r -n /tmp/wordpress/* {{path}}
+
+- name: Remove wordpress.tar.gz
+  file: path=/tmp/wordpress.tar.gz state=absent
+
+- name: Fetch random salts for WordPress config
+  local_action: command curl https://api.wordpress.org/secret-key/1.1/salt/
+  register: "wp_salt"
+  become: no
+  become_method: sudo
+
+
+- name: Copy WordPress config file
+  template: src=wp-config.php dest={{path}}
+
+- name: Change ownership of installation directory
+  file: path={{path}} owner=www-data group=www-data  state=directory recurse=yes setype=httpd_sys_content_t
+
+- name: Change ownership of wp-content directory
+  file: path={{path}}/wp-content/ owner=www-data group=www-data mode=755 state=directory recurse=yes

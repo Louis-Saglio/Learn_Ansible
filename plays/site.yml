@@ -1,0 +1,13 @@
+- name: Mysql
+  hosts: all
+  remote_user: louis
+  become: true
+  roles:
+    - mysql
+- name: Apache
+  hosts: all
+  remote_user: louis
+  become: true
+  roles:
+    - http
+    - ftp
