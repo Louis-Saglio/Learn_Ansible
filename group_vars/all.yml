@@ -3,6 +3,6 @@ wp_directory_name: 'wordpress'
 wp_db_name: 'wpdb'
 wp_db_username: 'louis'
 wp_db_password: "erty"
-wp_db_host: "{{ hostvars[groups['mysqld'][0]].ansible_host }}"
+wp_db_host: "{{ hostvars[groups['mysql'][0]].ansible_host }}"
 wp_table_prefix: 'wp_'
 wp_debug_mode: 'FALSE'

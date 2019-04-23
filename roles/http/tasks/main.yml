@@ -1,3 +1,5 @@
+# Heavily inspired by : https://www.infinitypp.com/ansible/install-wordpress-using-ansible-ubuntu-php7/
+
 - name: install Apache
   apt:
     name:
@@ -20,7 +22,7 @@
   notify: restart apache
 
 - name: install website
-  copy:
+  template:
     src: website.conf
     dest: /etc/apache2/sites-available/website.conf
   notify: restart apache
